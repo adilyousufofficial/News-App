@@ -29,7 +29,7 @@ class NewsVC: UIViewController {
         
         activityIndicator.start()
         
-        newsViewModelObject.getNewsArticles { [weak self] newsList, error in
+        newsViewModelObject.getNewsArticles { [weak self] newsList, errorMessage in
             DispatchQueue.main.async {
                 self?.activityIndicator.stop()
             }
@@ -40,9 +40,9 @@ class NewsVC: UIViewController {
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
-            } else if let error = error {
+            } else if let message = errorMessage {
                 DispatchQueue.main.async {
-                    Popup.showError(message: error.localizedDescription, on: self)
+                    Popup.showError(message: message, on: self)
                 }
             }
         }

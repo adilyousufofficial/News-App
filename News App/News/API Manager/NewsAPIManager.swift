@@ -8,16 +8,20 @@
 import Foundation
 
 class NewsAPIManager {
-    func getNewsArticles(completion: @escaping (_ response: News?, _ error: Error?) -> Void) {
-        NetworkManager().load(resource: NewsViewModel.create()) { result in
-            switch result {
-                case .success(let newsArticles):
-                    completion(newsArticles, nil)
-                    
-                case .failure(let error):
-                    completion(nil, error)
-                    
+    func getNewsArticles(completion: @escaping (_ response: News?, _ error: String?) -> Void) {
+        if let resource = NewsViewModel.createMostPopularResource() {
+            NetworkManager().load(resource: resource) { result in
+                switch result {
+                    case .success(let newsArticles):
+                        completion(newsArticles, nil)
+                        
+                    case .failure(let error):
+                        completion(nil, error.localizedDescription)
+                        
+                }
             }
+        } else {
+            completion(nil, "Invalid Resources")
         }
     }
 }

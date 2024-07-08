@@ -8,6 +8,6 @@
 import Foundation
 
 class Constants {
-    static let baseURL = "https://api.nytimes.com"
+    static var baseURL = "https://api.nytimes.com"
     static let apiKey = "NetlDvAkuIt0OUlB73LpcvHKSqPv8beJ"
 }
