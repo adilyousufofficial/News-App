@@ -8,7 +8,9 @@
 import UIKit
 
 class NewsAdapter: NSObject, UITableViewDataSource, UITableViewDelegate {
+    
     private var newsList: [Article] = []
+    weak var parentViewController: UIViewController?
     
     func updateNewsList(_ newsList: [Article]) {
         self.newsList = newsList
@@ -21,7 +23,7 @@ class NewsAdapter: NSObject, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "NewsCell", for: indexPath) as? NewsCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsCell.Identifier, for: indexPath) as? NewsCell else {
             return UITableViewCell()
         }
         
@@ -32,14 +34,12 @@ class NewsAdapter: NSObject, UITableViewDataSource, UITableViewDelegate {
         
         if let imageUrlString = article.media.first?.mediaMetadata.first?.url,
            let imageUrl = URL(string: imageUrlString) {
-            // Load the image asynchronously
-            URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        cell.newsImageView.image = image
-                    }
+            // Use ImageLoader to load image asynchronously
+            ImageLoader.loadImage(from: imageUrl) { image in
+                DispatchQueue.main.async {
+                    cell.newsImageView.image = image
                 }
-            }.resume()
+            }
         }
         
         return cell
@@ -49,6 +49,15 @@ class NewsAdapter: NSObject, UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // Handle cell selection if needed
+        
+        guard let parentViewController = parentViewController else { return }
+        
+        let selectedArticle = newsList[indexPath.row]
+        
+        let storyboard = UIStoryboard(name: "News", bundle: nil)
+        if let articleVC = storyboard.instantiateViewController(withIdentifier: ArticleVC.Identifier) as? ArticleVC {
+            articleVC.article = selectedArticle
+            parentViewController.navigationController?.pushViewController(articleVC, animated: true)
+        }
     }
 }

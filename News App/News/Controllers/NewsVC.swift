@@ -10,7 +10,6 @@ import UIKit
 class NewsVC: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
-    
     let newsViewModelObject = NewsViewModel()
     let newsAdapter = NewsAdapter()
     var activityIndicator: ActivityIndicator!
@@ -20,21 +19,18 @@ class NewsVC: UIViewController {
         
         self.title = "NY Times Most Popular"
         
-        // Register the cell class or nib
         tableView.register(UINib(nibName: NewsCell.nibName, bundle: nil), forCellReuseIdentifier: NewsCell.Identifier)
         
         tableView.dataSource = newsAdapter
         tableView.delegate = newsAdapter
+        newsAdapter.parentViewController = self
         
-        // Initialize and configure the activity indicator
         activityIndicator = ActivityIndicator(view: self.view)
         
-        // Show the activity indicator before starting the API call
         activityIndicator.start()
         
         newsViewModelObject.getNewsArticles { [weak self] newsList, error in
             DispatchQueue.main.async {
-                // Hide the activity indicator
                 self?.activityIndicator.stop()
             }
             
@@ -45,7 +41,6 @@ class NewsVC: UIViewController {
                     self.tableView.reloadData()
                 }
             } else if let error = error {
-                // Show error alert
                 DispatchQueue.main.async {
                     Popup.showError(message: error.localizedDescription, on: self)
                 }
